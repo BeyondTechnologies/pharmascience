@@ -1,0 +1,208 @@
+<mvc:View controllerName="rfscanner.pharmascience.controller.scanner"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:ndc="sap.ndc"
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core">
+    <Page id="page" title="{i18n>title}">
+        <content>
+        <f:SimpleForm
+                editable="false"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="3"
+                labelSpanM="4"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="0"
+                emptySpanL="4"
+                emptySpanM="0"
+                emptySpanS="0"
+                columnsXL="2"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false" >
+                <f:content>
+                    <Label text="{i18n>CurrentUser}">
+                    <layoutData>
+                            <l:GridData span="XL2 L2 M2 S3" />
+                        </layoutData>
+                    </Label>
+                    <Text text="{userModel>/user}">
+                    <layoutData>
+                        <l:GridData span="XL2 L2 M2 S3" />
+                    </layoutData>            
+                    </Text>
+                    <Label text="{i18n>Plant}">
+                    <layoutData>
+                            <l:GridData span="XL2 L2 M2 S3" />
+                        </layoutData>
+                    </Label>
+                    <Text text="{userModel>/userPlant}">
+                    <layoutData>
+                        <l:GridData span="XL2 L2 M2 S3" />
+                    </layoutData>            
+                    </Text>
+                    <Label text="{i18n>StorageLocation}">
+                    <layoutData>
+                            <l:GridData span="XL2 L2 M2 S3" />
+                        </layoutData>
+                    </Label>
+                    <Text text="{userModel>/userStorageLocation}">
+                    <layoutData>
+                        <l:GridData span="XL2 L2 M2 S3" />
+                    </layoutData>            
+                    </Text>
+                </f:content>
+            </f:SimpleForm>
+            <VBox class="sapUiTinyMarginTop">
+                <f:SimpleForm 
+                    editable="false"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="3"
+                    labelSpanM="4"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="4"
+                    emptySpanM="0"
+                    emptySpanS="0"
+                    columnsXL="2"
+                    columnsL="1"
+                    columnsM="1"
+                    singleContainerFullSize="false" >
+                   <f:content>
+                        <Label text="{i18n>WorkOrder}" class="sapUiSmallMarginTop">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                        <Input value="{workOrderModel>/workOrder}" change="onWorkOrderChange">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Input>
+                        <ndc:BarcodeScannerButton
+                            id="sampleBarcodeScannerButton"
+                            scanSuccess="onWorkOrderScanSuccess"
+                            scanFail="onWorkOrderScanError"
+                            dialogTitle="Barcode Scanner Button Sample"
+                            width="20%">
+                            <ndc:layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </ndc:layoutData>
+                        </ndc:BarcodeScannerButton>
+                        <Label text="{i18n>Description}" visible="{= ${workOrderModel>/materialInfoVisible}}">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                        <Text text="{workOrderModel>/workOrderDescription}" visible="{= ${workOrderModel>/materialInfoVisible}}">
+                             <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Text>
+                    </f:content>
+                </f:SimpleForm>
+
+                <IllustratedMessage
+					illustrationType="{= !${workOrderModel>/woOrderFound} ? 'sapIllus-NoSearchResults' : 'sapIllus-BeforeSearch' }"
+					title="{= !${workOrderModel>/woOrderFound} ? ${i18n>NotFoundTitle} : ${i18n>EnterPurchaseTitle} }"
+					description="{= !${workOrderModel>/woOrderFound} ? ${i18n>NotFoundDescription} : ${i18n>EnterPurchaseDescription} }"
+                    visible="{= !${workOrderModel>/materialInfoVisible}}"/>
+
+                <f:SimpleForm
+                    editable="false"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="3"
+                    labelSpanM="4"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="4"
+                    emptySpanM="0"
+                    emptySpanS="0"
+                    columnsXL="2"
+                    columnsL="1"
+                    columnsM="1"
+                    singleContainerFullSize="false" 
+                    visible="{workOrderModel>/materialInfoVisible}">
+                    <f:content>
+                        <Label text="{i18n>MaterialNumber}" class="sapUiSmallMarginTop">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                        <Input value="{workOrderModel>/material}" change="onMaterialChange">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Input>
+                        <ndc:BarcodeScannerButton
+                            scanSuccess="onMaterialScanSuccess"
+                            scanFail="onMaterialScanError"
+                            inputLiveUpdate="onMaterialScanLiveupdate"
+                            dialogTitle="Barcode Scanner Button Sample"
+                            width="20%"
+                        />
+                        <Label text="{i18n>Description}" visible="{= ${workOrderModel>/quantityInfoVisible}}">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                        <Text text="{workOrderModel>/materialDescription}" visible="{= ${workOrderModel>/quantityInfoVisible}}">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Text>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="3"
+                    labelSpanM="4"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="4"
+                    emptySpanM="0"
+                    emptySpanS="0"
+                    columnsXL="2"
+                    columnsL="1"
+                    columnsM="1"
+                    singleContainerFullSize="false" 
+                    visible="{workOrderModel>/quantityInfoVisible}">
+                    <f:content>
+                        <Label text="{i18n>Quantity}">
+                         <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                        <Input value="{Quantity}" change="onQuantityChanged">
+                        <layoutData>
+                            <l:GridData span="XL4 L4 M4 S4" />
+                        </layoutData>            
+                        </Input>
+                        <Input value="{workOrderModel>/unitOfMeasure}" editable="false" width="20%">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Input>
+                    </f:content>
+                </f:SimpleForm>
+        </VBox>
+        
+        </content>
+        <footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button type="Emphasized" text="{i18n>Save}" press="onSaveMaterial" visible="{workOrderModel>/enableSave}"/>
+			</Toolbar>
+		</footer>
+    </Page>
+</mvc:View>
