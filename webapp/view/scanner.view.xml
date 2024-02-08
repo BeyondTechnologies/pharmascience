@@ -49,14 +49,14 @@
                             <l:GridData span="XL2 L2 M2 S3" />
                         </layoutData>
                     </Label>
-                    <Text text="{userModel>/userStorageLocation}">
+                    <Text text="{userModel>/userStoreLocation}">
                     <layoutData>
                         <l:GridData span="XL2 L2 M2 S3" />
                     </layoutData>            
                     </Text>
                 </f:content>
             </f:SimpleForm>
-            <VBox class="sapUiTinyMarginTop">
+            <VBox class="sapUiSmallMarginTop">
                 <f:SimpleForm 
                     editable="false"
                     layout="ResponsiveGridLayout"
@@ -74,7 +74,7 @@
                     columnsM="1"
                     singleContainerFullSize="false" >
                    <f:content>
-                        <Label text="{i18n>WorkOrder}" class="sapUiTinyMarginTop">
+                        <Label text="{i18n>WorkOrder}" class="sapUiSmallMarginTop">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
@@ -88,7 +88,7 @@
                             id="sampleBarcodeScannerButton"
                             scanSuccess="onWorkOrderScanSuccess"
                             scanFail="onWorkOrderScanError"
-                            dialogTitle="Barcode Scanner Button Sample"
+                            dialogTitle="Scan"
                             width="20%">
                             <ndc:layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
@@ -131,7 +131,7 @@
                     singleContainerFullSize="false" 
                     visible="{workOrderModel>/materialInfoVisible}">
                     <f:content>
-                        <Label text="{i18n>MaterialNumber}" class="sapUiTinyMarginTop">
+                        <Label text="{i18n>MaterialNumber}" class="sapUiSmallMarginTop">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
@@ -145,7 +145,7 @@
                             scanSuccess="onMaterialScanSuccess"
                             scanFail="onMaterialScanError"
                             inputLiveUpdate="onMaterialScanLiveupdate"
-                            dialogTitle="Barcode Scanner Button Sample"
+                            dialogTitle="Scan"
                             width="20%"
                         />
                         <Label text="{i18n>Description}" visible="{= ${workOrderModel>/quantityInfoVisible}}">
@@ -183,7 +183,7 @@
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
                         </Label>
-                        <Input value="{Quantity}" change="onQuantityChanged">
+                        <Input value="{workOrderModel>/Quantity}" change="onQuantityChanged">
                         <layoutData>
                             <l:GridData span="XL4 L4 M4 S4" />
                         </layoutData>            
