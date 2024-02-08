@@ -74,7 +74,7 @@
                     columnsM="1"
                     singleContainerFullSize="false" >
                    <f:content>
-                        <Label text="{i18n>WorkOrder}" class="sapUiSmallMarginTop">
+                        <Label text="{i18n>WorkOrder}" class="sapUiTinyMarginTop">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
@@ -131,7 +131,7 @@
                     singleContainerFullSize="false" 
                     visible="{workOrderModel>/materialInfoVisible}">
                     <f:content>
-                        <Label text="{i18n>MaterialNumber}" class="sapUiSmallMarginTop">
+                        <Label text="{i18n>MaterialNumber}" class="sapUiTinyMarginTop">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
