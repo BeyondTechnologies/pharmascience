@@ -2,8 +2,10 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sap/base/Log",
-    "sap/m/MessageBox"
-], function (Controller, JSONModel, Log, MessageBox) {
+    "sap/m/MessageBox",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
+], function (Controller, JSONModel, Log, MessageBox, Filter, FilterOperator) {
         "use strict";
 
         return Controller.extend("rfscanner.pharmascience.controller.scanner", {
@@ -68,30 +70,42 @@ sap.ui.define([
 
             onQuantityChanged: function(oEvent){
                 let oParam = oEvent.getParameters(),
-                    sQty = oParam.text;
+                    sQty = oParam.value;
                 if (sQty !== "")
                     this._oWorkOrderModel.setProperty("/enableSave", true);
             },
 
             onSaveMaterial: function(){
-                let oModelData = this._oWorkOrderModel.getData();
-                let oParams = {
-                    OrderID: oModelData.OrderID,
-                    MaterialNumber: oModelData.MaterialNumber,
-                    Quantity: oModelData.Quantity,
-                    Uom: oModelData.Uom
-                }
-                this._oDataModel.callFunction("postnotification", // function import name
-                    "POST", // http method
-                    JSON.stringify(oParams), // function import parameters
-                    null,        
-                    function(oData, response) { 
-                        this._resetToWorkOrderData();
-                    }, // callback function for success
-                    function(oError){
+                let oModelData = this._oWorkOrderModel.getData(),
+                    oUserData = this._oUserModel.getData();
 
-                    } 
-                ); // callback function for error
+                let oParams = {
+                    OrderID: oModelData.workOrder,
+                    Material: oModelData.material,
+                    Quantity: oModelData.Quantity,
+                    Plant: oUserData.userPlant,
+                    StoreLocation: oUserData.userStoreLocation
+                }
+
+                this._oDataModel.callFunction("/PostNotification", {
+                        method: "POST",
+                        urlParameters: oParams,
+                        success: (oData, response) => {
+                            MessageBox.success(response);
+                            //reset Material fields
+                            this._oWorkOrderModel.setProperty("/material", "");
+                            this._oWorkOrderModel.setProperty("/materialDescription", "");
+                            this._oWorkOrderModel.setProperty("/quantityInfoVisible", false);
+                            this._oWorkOrderModel.setProperty("/Quantity", "");
+                            this._oWorkOrderModel.setProperty("/enableSave", false);
+                        },
+                        error: oError => {
+                            MessageBox.error(oError);
+                            //reset Quantity field
+                            this._oWorkOrderModel.setProperty("/Quantity", "");
+                            this._oWorkOrderModel.setProperty("/enableSave", false);
+                        }
+                      });
             },
 
             _setInitialData: function(){
@@ -139,12 +153,20 @@ sap.ui.define([
             },
 
             _getMaterial: function(sMaterialnumber){
-                var sPath = `/Material('${sMaterialnumber}')`;
+                var sPath = `Material`;
+
+                let sUserPlant = this._oUserModel.getProperty("/userPlant"),
+                    suserStoreLocation = this._oUserModel.getProperty("/userStoreLocation");
                 this._oDataModel.read(sPath, {
+                    filters: [
+                        new Filter("MaterialNumber", FilterOperator.EQ, sMaterialnumber),
+                        new Filter("Plant", FilterOperator.EQ, sUserPlant),
+                        new Filter("StorageLocation", FilterOperator.EQ, suserStoreLocation)
+                    ],
                     success: oResult => {
-                        this._oWorkOrderModel.setProperty("/material", oResult.MaterialNumber);
-                        this._oWorkOrderModel.setProperty("/materialDescription", oResult.Text);
-                        this._oWorkOrderModel.setProperty("/unitOfMeasure", oResult.Uom);
+                        this._oWorkOrderModel.setProperty("/material", oResult.results[0].MaterialNumber);
+                        this._oWorkOrderModel.setProperty("/materialDescription", oResult.results[0].Description);
+                        this._oWorkOrderModel.setProperty("/unitOfMeasure", oResult.results[0].Uom);
                         this._oWorkOrderModel.setProperty("/quantityInfoVisible", true);
                     },
                     error: function(oError) {
@@ -173,7 +195,7 @@ sap.ui.define([
                     this._oDataModel.read(sPath, {
                         success: oResult => {
                             this._oUserModel.setProperty("/userPlant", oResult.Plant);
-                            this._oUserModel.setProperty("/userStorageLocation", oResult.StorageLocation);
+                            this._oUserModel.setProperty("/userStoreLocation", oResult.StorageLocation);
                         },
                         error: function(oError) {
                             // MessageBox.error(this.i18nModel.getResourceBundle().getText("ErrorMessage.GeneralPassportCode.Error"));
