@@ -14,11 +14,14 @@
                 <Key>
                     <PropertyRef Name="MaterialNumber"/>
                     <PropertyRef Name="Plant"/>
+                    <PropertyRef Name="StorageLocation"/>
                 </Key>
                 <Property Name="MaterialNumber" Type="Edm.String" Nullable="false" MaxLength="18" sap:unicode="false" sap:unit="Uom" sap:label="Material" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="Plant" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Plant" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="StorageLocation" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Store Location" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="Uom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Unit of Measure" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
                 <Property Name="Barcode" Type="Edm.String" Nullable="false" MaxLength="18" sap:unicode="false" sap:unit="Uom" sap:label="Barcode" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Description" Type="Edm.String" Nullable="false" MaxLength="220" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityType Name="WorkOrder" sap:label="Work Order" sap:content-version="1">
                 <Key>
@@ -28,10 +31,23 @@
                 <Property Name="Plant" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Plant" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Text" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
+            <ComplexType Name="Return">
+                <Property Name="TYPE" Type="Edm.String" MaxLength="1" sap:label="Message type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="20" sap:label="Message Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="NUMBER" Type="Edm.String" MaxLength="3" sap:label="Message number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MESSAGE" Type="Edm.String" MaxLength="220" sap:label="Message text" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </ComplexType>
             <EntityContainer Name="ZIW41_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="User" EntityType="ZIW41_SRV.User" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
                 <EntitySet Name="Material" EntityType="ZIW41_SRV.Material" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
                 <EntitySet Name="WorkOrder" EntityType="ZIW41_SRV.WorkOrder" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <FunctionImport Name="PostNotification" ReturnType="ZIW41_SRV.Return" m:HttpMethod="POST">
+                    <Parameter Name="StoreLocation" Type="Edm.String" Mode="In" MaxLength="4"/>
+                    <Parameter Name="Plant" Type="Edm.String" Mode="In" MaxLength="4"/>
+                    <Parameter Name="Quantity" Type="Edm.Decimal" Mode="In" Precision="3" Scale="3"/>
+                    <Parameter Name="Material" Type="Edm.String" Mode="In" MaxLength="18"/>
+                    <Parameter Name="OrderID" Type="Edm.String" Mode="In" MaxLength="12"/>
+                </FunctionImport>
             </EntityContainer>
             <atom:link rel="self" href="https://vhpsidevci.sap.pharmascience.com:44300/sap/opu/odata/sap/ZIW41_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
             <atom:link rel="latest-version" href="https://vhpsidevci.sap.pharmascience.com:44300/sap/opu/odata/sap/ZIW41_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
