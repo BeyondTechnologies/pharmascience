@@ -30,7 +30,7 @@ modules:
           ServiceInstanceName: rfscannerpharmascience-xsuaa-srv
           ServiceKeyName: rfscannerpharmascience-uaa-key
           sap.cloud.service: rfscannerpharmascience
-        existing_destinations_policy: ignore
+        existing_destinations_policy: update
   build-parameters:
     no-source: true
 - name: rfscannerpharmascience-app-content

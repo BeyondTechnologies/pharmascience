@@ -10,28 +10,28 @@
         <f:SimpleForm
                 editable="false"
                 layout="ResponsiveGridLayout"
-                labelSpanXL="4"
+                labelSpanXL="3"
                 labelSpanL="3"
                 labelSpanM="4"
                 labelSpanS="12"
                 adjustLabelSpan="false"
-                emptySpanXL="0"
+                emptySpanXL="4"
                 emptySpanL="4"
                 emptySpanM="0"
                 emptySpanS="0"
-                columnsXL="2"
+                columnsXL="1"
                 columnsL="1"
                 columnsM="1"
                 singleContainerFullSize="false" >
                 <f:content>
                     <Label text="{i18n>CurrentUser}">
                     <layoutData>
-                            <l:GridData span="XL2 L2 M2 S3" />
+                            <l:GridData span="XL1 L2 M2 S3" />
                         </layoutData>
                     </Label>
                     <Text text="{userModel>/user}">
                     <layoutData>
-                        <l:GridData span="XL2 L2 M2 S3" />
+                        <l:GridData span="XL3 L2 M2 S3" />
                     </layoutData>            
                     </Text>
                     <Label text="{i18n>Plant}">
@@ -56,23 +56,27 @@
                     </Text>
                 </f:content>
             </f:SimpleForm>
-            <VBox class="sapUiSmallMarginTop">
+            <IllustratedMessage
+                illustrationType="sapIllus-NoEntries"
+                description="{userModel>/UserNotFoundDescription}"
+                visible="{= !${userModel>/userInfoVisible}}"/>
+            <VBox class="sapUiSmallMarginTop" visible="{userModel>/userInfoVisible}">
                 <f:SimpleForm 
                     editable="false"
                     layout="ResponsiveGridLayout"
-                    labelSpanXL="4"
-                    labelSpanL="3"
-                    labelSpanM="4"
+                    labelSpanXL="16"
+                    labelSpanL="4"
+                    labelSpanM="3"
                     labelSpanS="12"
                     adjustLabelSpan="false"
-                    emptySpanXL="0"
+                    emptySpanXL="4"
                     emptySpanL="4"
                     emptySpanM="0"
                     emptySpanS="0"
-                    columnsXL="2"
-                    columnsL="1"
-                    columnsM="1"
-                    singleContainerFullSize="false" >
+                    columnsXL="1"
+                    columnsL="2"
+                    columnsM="3"
+                    singleContainerFullSize="false">
                    <f:content>
                         <Label text="{i18n>WorkOrder}" class="sapUiSmallMarginTop">
                             <layoutData>
@@ -116,12 +120,12 @@
                 <f:SimpleForm
                     editable="false"
                     layout="ResponsiveGridLayout"
-                    labelSpanXL="4"
+                    labelSpanXL="3"
                     labelSpanL="3"
                     labelSpanM="4"
                     labelSpanS="12"
                     adjustLabelSpan="false"
-                    emptySpanXL="0"
+                    emptySpanXL="4"
                     emptySpanL="4"
                     emptySpanM="0"
                     emptySpanS="0"
@@ -163,12 +167,12 @@
                 <f:SimpleForm
                     editable="true"
                     layout="ResponsiveGridLayout"
-                    labelSpanXL="4"
+                    labelSpanXL="3"
                     labelSpanL="3"
                     labelSpanM="4"
                     labelSpanS="12"
                     adjustLabelSpan="false"
-                    emptySpanXL="0"
+                    emptySpanXL="4"
                     emptySpanL="4"
                     emptySpanM="0"
                     emptySpanS="0"

@@ -40,6 +40,6 @@ server:
         annotations: []
         service:
           - urlPath: /sap/opu/odata/sap/ZIW41_SRV/
-            metadataXmlPath: ./webapp/localService/metadata.xml
-            mockdataRootPath: ./webapp/localService/mockdata
+            metadataXmlPath: ./webapp/localService/mainService/metadata.xml
+            mockdataRootPath: ./webapp/localService/mainService/mockdata
             generateMockData: true

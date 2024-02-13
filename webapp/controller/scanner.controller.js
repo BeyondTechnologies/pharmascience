@@ -183,22 +183,30 @@ sap.ui.define([
                         materialInfoVisible: false,
                         quantityInfoVisible: false,
                         inputPopulated: false,
-                        woOrderFound: true
+                        woOrderFound: true,
+                        userInfoVisible: false
                     });
                     this.getView().setModel(this._oUserModel , "userModel");
 
-                    let sCurrentUser = sap.ushell.Container.getService("UserInfo").getId();
-                    // this._oWorkOrderModel.setProperty("/user", sCurrentUser);
-                    this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('${sCurrentUser}')`;
-                    let sPath = `/User('JBULDA')`;
+                    let sCurrentUser = sap.ushell.Container.getService("UserInfo");
+                    let sSapUsername = sap.ushell.Container.getService("UserInfo").getEmail() ? 
+                                        sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
+                                        sap.ushell.Container.getService("UserInfo").getId();
+                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sCurrentUser.getEmail()})`);
+                    let sPath = `/User('${sSapUsername}')`;
+
+                    //test
+                    // this._oUserModel.setProperty("/user", "JBULDA");
+                    // let sPath = `/User('JBULDA')`;
                     this._oDataModel.read(sPath, {
                         success: oResult => {
+                            this._oUserModel.setProperty("/userInfoVisible", true);
                             this._oUserModel.setProperty("/userPlant", oResult.Plant);
                             this._oUserModel.setProperty("/userStoreLocation", oResult.StorageLocation);
                         },
                         error: function(oError) {
-                            // MessageBox.error(this.i18nModel.getResourceBundle().getText("ErrorMessage.GeneralPassportCode.Error"));
+                            let sErrorMsg = JSON.parse(oError.response.body).error.message.value;
+                            this._oUserModel.setProperty("/UserNotFoundDescription", sErrorMsg);
                         }.bind(this)
                     });
                 });
