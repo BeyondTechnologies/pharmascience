@@ -11,7 +11,7 @@ sap.ui.define([
         return Controller.extend("rfscanner.pharmascience.controller.scanner", {
             onInit: async function () {
                 var sUrl = "/sap/opu/odata/sap/ZIW41_SRV";
-                this._oDataModel = new sap.ui.model.odata.ODataModel(sUrl, true);
+                this._oDataModel = this.getOwnerComponent().getModel();
                 this._i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
                 this._setInitialData();
@@ -128,6 +128,7 @@ sap.ui.define([
                     title: this._i18n.getText("MaterialNotFound")
                 });
                 this._oWorkOrderModel.setProperty("/material", "");
+                this._oWorkOrderModel.setProperty("/materialDescription", "");
             },
 
             _getWorkOrder: function(sWoNumber){
@@ -153,7 +154,7 @@ sap.ui.define([
             },
 
             _getMaterial: function(sMaterialnumber){
-                var sPath = `Material`;
+                var sPath = `/Material`;
 
                 let sUserPlant = this._oUserModel.getProperty("/userPlant"),
                     suserStoreLocation = this._oUserModel.getProperty("/userStoreLocation");
@@ -183,22 +184,30 @@ sap.ui.define([
                         materialInfoVisible: false,
                         quantityInfoVisible: false,
                         inputPopulated: false,
-                        woOrderFound: true
+                        woOrderFound: true,
+                        userInfoVisible: false
                     });
                     this.getView().setModel(this._oUserModel , "userModel");
 
-                    let sCurrentUser = sap.ushell.Container.getService("UserInfo").getId();
-                    // this._oWorkOrderModel.setProperty("/user", sCurrentUser);
-                    this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('${sCurrentUser}')`;
-                    let sPath = `/User('JBULDA')`;
+                    let sCurrentUser = sap.ushell.Container.getService("UserInfo");
+                    let sSapUsername = sap.ushell.Container.getService("UserInfo").getEmail() ? 
+                                        sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
+                                        sap.ushell.Container.getService("UserInfo").getId();
+                                      
+                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
+                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+
+                    // this._oUserModel.setProperty("/user", "JBULDA");
+                    // let sPath = `/User('JBULDA')`;
                     this._oDataModel.read(sPath, {
                         success: oResult => {
+                            this._oUserModel.setProperty("/userInfoVisible", true);
                             this._oUserModel.setProperty("/userPlant", oResult.Plant);
                             this._oUserModel.setProperty("/userStoreLocation", oResult.StorageLocation);
                         },
                         error: function(oError) {
-                            // MessageBox.error(this.i18nModel.getResourceBundle().getText("ErrorMessage.GeneralPassportCode.Error"));
+                            let sErrorMsg =  JSON.parse(oError.responseText).error.message.value;
+                            this._oUserModel.setProperty("/UserNotFoundDescription", sErrorMsg);
                         }.bind(this)
                     });
                 });
