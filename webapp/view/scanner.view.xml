@@ -78,7 +78,7 @@
                     columnsM="3"
                     singleContainerFullSize="false">
                    <f:content>
-                        <Label text="{i18n>WorkOrder}" class="sapUiSmallMarginTop">
+                        <Label text="{i18n>WorkOrder}" class="sapUiTinyMarginTop">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
@@ -120,22 +120,22 @@
                 <f:SimpleForm
                     editable="false"
                     layout="ResponsiveGridLayout"
-                    labelSpanXL="3"
-                    labelSpanL="3"
-                    labelSpanM="4"
+                   labelSpanXL="16"
+                    labelSpanL="4"
+                    labelSpanM="3"
                     labelSpanS="12"
                     adjustLabelSpan="false"
                     emptySpanXL="4"
                     emptySpanL="4"
                     emptySpanM="0"
                     emptySpanS="0"
-                    columnsXL="2"
-                    columnsL="1"
-                    columnsM="1"
+                    columnsXL="1"
+                    columnsL="2"
+                    columnsM="3"
                     singleContainerFullSize="false" 
                     visible="{workOrderModel>/materialInfoVisible}">
                     <f:content>
-                        <Label text="{i18n>MaterialNumber}" class="sapUiSmallMarginTop">
+                        <Label text="{i18n>MaterialNumber}" class="sapUiTinyMarginTop">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
@@ -167,18 +167,18 @@
                 <f:SimpleForm
                     editable="true"
                     layout="ResponsiveGridLayout"
-                    labelSpanXL="3"
-                    labelSpanL="3"
-                    labelSpanM="4"
+                    labelSpanXL="16"
+                    labelSpanL="4"
+                    labelSpanM="3"
                     labelSpanS="12"
                     adjustLabelSpan="false"
                     emptySpanXL="4"
                     emptySpanL="4"
                     emptySpanM="0"
                     emptySpanS="0"
-                    columnsXL="2"
-                    columnsL="1"
-                    columnsM="1"
+                    columnsXL="1"
+                    columnsL="2"
+                    columnsM="3"
                     singleContainerFullSize="false" 
                     visible="{workOrderModel>/quantityInfoVisible}">
                     <f:content>
