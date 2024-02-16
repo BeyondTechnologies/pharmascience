@@ -114,7 +114,7 @@
                 <IllustratedMessage
 					illustrationType="{= !${workOrderModel>/woOrderFound} ? 'sapIllus-NoSearchResults' : 'sapIllus-BeforeSearch' }"
 					title="{= !${workOrderModel>/woOrderFound} ? ${i18n>NotFoundTitle} : ${i18n>EnterPurchaseTitle} }"
-					description="{= !${workOrderModel>/woOrderFound} ? ${i18n>NotFoundDescription} : ${i18n>EnterPurchaseDescription} }"
+					description="{workOrderModel>/OrderNotFoundDescription}"
                     visible="{= !${workOrderModel>/materialInfoVisible}}"/>
 
                 <f:SimpleForm
