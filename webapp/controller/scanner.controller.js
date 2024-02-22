@@ -68,9 +68,18 @@ sap.ui.define([
 
             onQuantityChanged: function(oEvent){
                 let oParam = oEvent.getParameters(),
-                    sQty   = oParam.value;
+                    sQty   = oParam.value,
+                    dQuantityInStock = this._oWorkOrderModel.getProperty("/quantityInStock");
+
                 if (sQty !== "")
                     this._oWorkOrderModel.setProperty("/enableSave", true);
+                if (parseFloat(sQty) > dQuantityInStock){
+                    oEvent.getSource().setValueState("Error");
+                    oEvent.getSource().setValueStateText(this._i18n.getText("CannotBeHigherThanStockQuantity", [dQuantityInStock]));
+                    this._oWorkOrderModel.setProperty("/enableSave", false);
+                } else {
+                    oEvent.getSource().setValueState("None");
+                } 
             },
 
             onSaveMaterial: function(){
@@ -111,11 +120,13 @@ sap.ui.define([
             _setInitialData: function(){
                  //initial setup upon opening the app
                  this._oWorkOrderModel = new JSONModel({
-                    enableSave         : false,
-                    materialInfoVisible: false,
-                    quantityInfoVisible: false,
-                    inputPopulated     : false,
-                    woOrderFound       : true
+                    enableSave            : false,
+                    materialInfoVisible   : false,
+                    quantityInfoVisible   : false,
+                    inputPopulated        : false,
+                    woOrderFound          : true,
+                    quantityValueState    : "None",
+                    materialWarningVisible: false
                 });
                 this.getView().setModel(this._oWorkOrderModel , "workOrderModel");
             },
@@ -171,7 +182,18 @@ sap.ui.define([
                         this._oWorkOrderModel.setProperty("/material"           , oResult.results[0].MaterialNumber);
                         this._oWorkOrderModel.setProperty("/materialDescription", oResult.results[0].Description);
                         this._oWorkOrderModel.setProperty("/unitOfMeasure"      , oResult.results[0].Uom);
+                        this._oWorkOrderModel.setProperty("/quantityInStock"    , parseFloat(oResult.results[0].QuantityInStock));
+                        this._oWorkOrderModel.setProperty("/Quantity"           , "");
+                        this._oWorkOrderModel.setProperty("/quantityValueState" , "None");
                         this._oWorkOrderModel.setProperty("/quantityInfoVisible", true);
+
+                        //if remaining quantity is 0
+                        if (parseFloat(oResult.results[0].QuantityInStock) < 1){
+                            this._oWorkOrderModel.setProperty("/quantityInfoVisible"   , false);
+                            this._oWorkOrderModel.setProperty("/materialWarningVisible", true);
+                        } else {
+                            this._oWorkOrderModel.setProperty("/materialWarningVisible", false);
+                        }
                     },
                     error: function(oError) {
                         let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
