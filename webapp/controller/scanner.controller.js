@@ -100,12 +100,7 @@ sap.ui.define([
                         urlParameters: oParams,
                         success      : (oData, response) => {
                             MessageBox.success(this._i18n.getText("MaterialAddded"));
-                            //reset Material fields
-                            this._oWorkOrderModel.setProperty("/material"           , "");
-                            this._oWorkOrderModel.setProperty("/materialDescription", "");
-                            this._oWorkOrderModel.setProperty("/quantityInfoVisible", false);
-                            this._oWorkOrderModel.setProperty("/Quantity"           , "");
-                            this._oWorkOrderModel.setProperty("/enableSave"         , false);
+                            this._setInitialData();
                         },
                         error        : oError => {
                             let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
@@ -223,12 +218,12 @@ sap.ui.define([
                                         sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
-                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    // this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
+                    // let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    // this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('JBULDA')`;
+                    this._oUserModel.setProperty("/user", "JBULDA");
+                    let sPath = `/User('JBULDA')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
