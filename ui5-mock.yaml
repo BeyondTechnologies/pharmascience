@@ -17,11 +17,11 @@ server:
           - path: /sap
             url: http://devpms:443/
             client: "300"
-            destination: devpms
+            destination: dev_pp
           - path: /sap
             url: http://devpms:443/
             client: "300"
-            destination: devpms
+            destination: dev_pp
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
