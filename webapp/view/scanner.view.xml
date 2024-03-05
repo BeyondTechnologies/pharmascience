@@ -26,7 +26,7 @@
                 <f:content>
                     <Label text="{i18n>CurrentUser}">
                     <layoutData>
-                            <l:GridData span="XL1 L2 M2 S3" />
+                            <l:GridData span="XL2 L2 M2 S3" />
                         </layoutData>
                     </Label>
                     <Text text="{userModel>/user}">
@@ -41,7 +41,7 @@
                     </Label>
                     <Text text="{userModel>/userPlant}">
                     <layoutData>
-                        <l:GridData span="XL2 L2 M2 S3" />
+                        <l:GridData span="XL1 L2 M2 S3" />
                     </layoutData>            
                     </Text>
                     <Label text="{i18n>StorageLocation}">
@@ -51,7 +51,7 @@
                     </Label>
                     <Text text="{userModel>/userStoreLocation}">
                     <layoutData>
-                        <l:GridData span="XL2 L2 M2 S3" />
+                        <l:GridData span="XL1 L2 M2 S3" />
                     </layoutData>            
                     </Text>
                 </f:content>
@@ -114,7 +114,7 @@
                 <IllustratedMessage
 					illustrationType="{= !${workOrderModel>/woOrderFound} ? 'sapIllus-NoSearchResults' : 'sapIllus-BeforeSearch' }"
 					title="{= !${workOrderModel>/woOrderFound} ? ${i18n>NotFoundTitle} : ${i18n>EnterPurchaseTitle} }"
-					description="{= !${workOrderModel>/woOrderFound} ? ${i18n>NotFoundDescription} : ${i18n>EnterPurchaseDescription} }"
+					description="{workOrderModel>/OrderNotFoundDescription}"
                     visible="{= !${workOrderModel>/materialInfoVisible}}"/>
 
                 <f:SimpleForm
@@ -152,6 +152,20 @@
                             dialogTitle="Scan"
                             width="20%"
                         />
+                        <Label text="" visible="{workOrderModel>/materialWarningVisible}">
+                            <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                        <MessageStrip
+                            text="{i18n>MaterialWarningMessage}"
+                            type="Warning"
+                            showIcon="true"
+                            visible="{workOrderModel>/materialWarningVisible}">
+                              <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </MessageStrip>
                         <Label text="{i18n>Description}" visible="{= ${workOrderModel>/quantityInfoVisible}}">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
@@ -187,7 +201,7 @@
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
                         </Label>
-                        <Input value="{workOrderModel>/Quantity}" change="onQuantityChanged">
+                        <Input value="{workOrderModel>/Quantity}" liveChange="onQuantityChanged" valueState="{workOrderModel>/quantityValueState}">
                         <layoutData>
                             <l:GridData span="XL4 L4 M4 S4" />
                         </layoutData>            
@@ -205,7 +219,7 @@
         <footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button type="Emphasized" text="{i18n>Save}" press="onSaveMaterial" visible="{workOrderModel>/enableSave}"/>
+				<Button type="Emphasized" text="{i18n>Save}" press="onSaveMaterial" enabled="{workOrderModel>/enableSave}"/>
 			</Toolbar>
 		</footer>
     </Page>

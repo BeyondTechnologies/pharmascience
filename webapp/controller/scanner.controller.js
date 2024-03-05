@@ -10,7 +10,6 @@ sap.ui.define([
 
         return Controller.extend("rfscanner.pharmascience.controller.scanner", {
             onInit: async function () {
-                var sUrl = "/sap/opu/odata/sap/ZIW41_SRV";
                 this._oDataModel = this.getOwnerComponent().getModel();
                 this._i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
@@ -19,31 +18,30 @@ sap.ui.define([
             },
 
             onWorkOrderChange: function(oEvent){
-                let oParams = oEvent.getParameters(),
+                let oParams   = oEvent.getParameters(),
                     sWoNumber = oParams.value;
                 
                 sWoNumber !== "" ? this._getWorkOrder(sWoNumber) : this._setInitialData();
             },
 
             onWorkOrderScanSuccess: function(oEvent) {
-                let oParams = oEvent.getParameters(),
+                let oParams   = oEvent.getParameters(),
                     sWoNumber = oParams.text;
 
                 sWoNumber !== "" ? this._getWorkOrder(sWoNumber) : this._setInitialData();
                 
-                // this._oWorkOrderModel.setData(oMockData);
                 if (oEvent.getParameter("cancelled")) {
                     this._oWorkOrderModel.setData({});
-                    MessageToast.show("Scan cancelled", { duration:1000 });
+                    MessageToast.show(this._i18n.getText("ScanCancelled") + ": ", { duration:1000 });
                 }
             },
 
             onWorkOrderScanError: function(oEvent) {
-                MessageToast.show("Scan failed: " + oEvent, { duration:1000 });
+                MessageToast.show(this._i18n.getText("ScanFailed") + ": " + oEvent, { duration:1000 });
             },
 
             onMaterialChange: function(oEvent){
-                let oParams = oEvent.getParameters(),
+                let oParams   = oEvent.getParameters(),
                     sMaterial = oParams.value;
                 
                 if (sMaterial !== "") 
@@ -51,7 +49,7 @@ sap.ui.define([
             },
 
             onMaterialScanSuccess: function(oEvent) {
-                let oParams = oEvent.getParameters(),
+                let oParams   = oEvent.getParameters(),
                     sMaterial = oParams.text;
 
                
@@ -60,49 +58,55 @@ sap.ui.define([
 
 				if (oEvent.getParameter("cancelled")) {
 					this._oWorkOrderModel.setData({});
-					MessageToast.show("Scan cancelled", { duration:1000 });
+					MessageToast.show(this._i18n.getText("ScanCancelled") + ": ", { duration:1000 });
 				}
 			},
 
 			onMaterialScanError: function(oEvent) {
-				MessageToast.show("Scan failed: " + oEvent, { duration:1000 });
+				MessageToast.show(this._i18n.getText("ScanFailed") + ": " + oEvent, { duration:1000 });
 			},
 
             onQuantityChanged: function(oEvent){
                 let oParam = oEvent.getParameters(),
-                    sQty = oParam.value;
+                    sQty   = oParam.value,
+                    dQuantityInStock = this._oWorkOrderModel.getProperty("/quantityInStock");
+
                 if (sQty !== "")
                     this._oWorkOrderModel.setProperty("/enableSave", true);
+                if (parseFloat(sQty) > dQuantityInStock){
+                    oEvent.getSource().setValueState("Error");
+                    oEvent.getSource().setValueStateText(this._i18n.getText("CannotBeHigherThanStockQuantity", [dQuantityInStock]));
+                    this._oWorkOrderModel.setProperty("/enableSave", false);
+                } else {
+                    oEvent.getSource().setValueState("None");
+                } 
             },
 
             onSaveMaterial: function(){
                 let oModelData = this._oWorkOrderModel.getData(),
-                    oUserData = this._oUserModel.getData();
+                    oUserData  = this._oUserModel.getData();
 
+                
                 let oParams = {
-                    OrderID: oModelData.workOrder,
-                    Material: oModelData.material,
-                    Quantity: oModelData.Quantity,
-                    Plant: oUserData.userPlant,
+                    OrderID      : oModelData.workOrder,
+                    Material     : oModelData.material,
+                    Quantity     : oModelData.Quantity,
+                    Plant        : oUserData.userPlant,
                     StoreLocation: oUserData.userStoreLocation
                 }
 
                 this._oDataModel.callFunction("/PostNotification", {
-                        method: "POST",
+                        method       : "POST",
                         urlParameters: oParams,
-                        success: (oData, response) => {
-                            MessageBox.success(response);
-                            //reset Material fields
-                            this._oWorkOrderModel.setProperty("/material", "");
-                            this._oWorkOrderModel.setProperty("/materialDescription", "");
-                            this._oWorkOrderModel.setProperty("/quantityInfoVisible", false);
-                            this._oWorkOrderModel.setProperty("/Quantity", "");
-                            this._oWorkOrderModel.setProperty("/enableSave", false);
+                        success      : (oData, response) => {
+                            MessageBox.success(this._i18n.getText("MaterialAddded"));
+                            this._setInitialData();
                         },
-                        error: oError => {
-                            MessageBox.error(oError);
+                        error        : oError => {
+                            let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
+                            MessageBox.error(sErrorMsg);
                             //reset Quantity field
-                            this._oWorkOrderModel.setProperty("/Quantity", "");
+                            this._oWorkOrderModel.setProperty("/Quantity"  , "");
                             this._oWorkOrderModel.setProperty("/enableSave", false);
                         }
                       });
@@ -111,68 +115,88 @@ sap.ui.define([
             _setInitialData: function(){
                  //initial setup upon opening the app
                  this._oWorkOrderModel = new JSONModel({
-                    enableSave: false,
-                    materialInfoVisible: false,
-                    quantityInfoVisible: false,
-                    inputPopulated: false,
-                    woOrderFound: true
+                    enableSave            : false,
+                    materialInfoVisible   : false,
+                    quantityInfoVisible   : false,
+                    inputPopulated        : false,
+                    woOrderFound          : true,
+                    quantityValueState    : "None",
+                    materialWarningVisible: false
                 });
                 this.getView().setModel(this._oWorkOrderModel , "workOrderModel");
             },
 
-            /**
-             * This is to reset the data after a successful Material save
-             */
-            _showMaterialNotFound: function(oError){
-                MessageBox.error(this._i18n.getText("MaterialNotFoundDescription"), {
-                    title: this._i18n.getText("MaterialNotFound")
-                });
-                this._oWorkOrderModel.setProperty("/material", "");
-                this._oWorkOrderModel.setProperty("/materialDescription", "");
-            },
-
             _getWorkOrder: function(sWoNumber){
                 return new Promise((resolve, reject) => {
-                    var sPath = `/WorkOrder('${sWoNumber}')`;
+                    let sPath = `/WorkOrder('${sWoNumber}')`;
                     this._oDataModel.read(sPath, {
                         success: oResult => {
-                            this._oWorkOrderModel.setProperty("/workOrder", oResult.OrderID);
+                            //set Order info
+                            this._oWorkOrderModel.setProperty("/workOrder"           , oResult.OrderID);
                             this._oWorkOrderModel.setProperty("/workOrderDescription", oResult.Text);
-                            this._oWorkOrderModel.setProperty("/materialInfoVisible", true);
-                            this._oWorkOrderModel.setProperty("/quantityInfoVisible", false);
-                            this._oWorkOrderModel.setProperty("/enableSave", false);
-                            this._oWorkOrderModel.setProperty("/woOrderFound", true);
+                            this._oWorkOrderModel.setProperty("/woOrderFound"        , true);
+
+                            //show material fileds
+                            this._oWorkOrderModel.setProperty("/materialInfoVisible" , true);
+
+                            //quantity fields are hidden until matiral is successfully found
+                            this._oWorkOrderModel.setProperty("/quantityInfoVisible" , false);
+
+                            //save button is only enabled once quantity is entered.
+                            this._oWorkOrderModel.setProperty("/enableSave"          , false);
+
+                            //reset material fields in case of material re-scan
+                            this._oWorkOrderModel.setProperty("/material", "");
+                            this._oWorkOrderModel.setProperty("/materialDescription", "");
                             resolve();
                         },
                         error: function(oError) {
                             this._setInitialData();
-                            this._oWorkOrderModel.setProperty("/woOrderFound", false);
-                            // MessageBox.error(this.i18nModel.getResourceBundle().getText("ErrorMessage.GeneralPassportCode.Error"));
+                            let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
+
+                            //set error message to the IllustratedMessage description field
+                            this._oWorkOrderModel.setProperty("/OrderNotFoundDescription", sErrorMsg);
+                            this._oWorkOrderModel.setProperty("/woOrderFound"            , false);
                         }.bind(this)
                     });
                 });
             },
 
             _getMaterial: function(sMaterialnumber){
-                var sPath = `/Material`;
-
-                let sUserPlant = this._oUserModel.getProperty("/userPlant"),
+                let sPath              = `/Material`,
+                    sUserPlant         = this._oUserModel.getProperty("/userPlant"),
                     suserStoreLocation = this._oUserModel.getProperty("/userStoreLocation");
                 this._oDataModel.read(sPath, {
                     filters: [
-                        new Filter("MaterialNumber", FilterOperator.EQ, sMaterialnumber),
-                        new Filter("Plant", FilterOperator.EQ, sUserPlant),
+                        new Filter("MaterialNumber" , FilterOperator.EQ, sMaterialnumber),
+                        new Filter("Plant"          , FilterOperator.EQ, sUserPlant),
                         new Filter("StorageLocation", FilterOperator.EQ, suserStoreLocation)
                     ],
                     success: oResult => {
-                        this._oWorkOrderModel.setProperty("/material", oResult.results[0].MaterialNumber);
+                        //set material info
+                        this._oWorkOrderModel.setProperty("/material"           , oResult.results[0].MaterialNumber);
                         this._oWorkOrderModel.setProperty("/materialDescription", oResult.results[0].Description);
-                        this._oWorkOrderModel.setProperty("/unitOfMeasure", oResult.results[0].Uom);
+                        this._oWorkOrderModel.setProperty("/unitOfMeasure"      , oResult.results[0].Uom);
+                        this._oWorkOrderModel.setProperty("/quantityInStock"    , parseFloat(oResult.results[0].QuantityInStock));
+                        this._oWorkOrderModel.setProperty("/Quantity"           , "");
+                        this._oWorkOrderModel.setProperty("/quantityValueState" , "None");
                         this._oWorkOrderModel.setProperty("/quantityInfoVisible", true);
+
+                        //if remaining quantity is 0
+                        if (parseFloat(oResult.results[0].QuantityInStock) < 1){
+                            this._oWorkOrderModel.setProperty("/quantityInfoVisible"   , false);
+                            this._oWorkOrderModel.setProperty("/materialWarningVisible", true);
+                        } else {
+                            this._oWorkOrderModel.setProperty("/materialWarningVisible", false);
+                        }
                     },
                     error: function(oError) {
-                        this._showMaterialNotFound(oError);
-                        // MessageBox.error(this.i18nModel.getResourceBundle().getText("ErrorMessage.GeneralPassportCode.Error"));
+                        let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
+                        MessageBox.error(sErrorMsg);
+
+                        //reset material fields
+                        this._oWorkOrderModel.setProperty("/material"           , "");
+                        this._oWorkOrderModel.setProperty("/materialDescription", "");
                     }.bind(this)
                 });
             },
@@ -180,29 +204,31 @@ sap.ui.define([
             _getCurrentUserInfo: function(){
                 return new Promise((resolve, reject) => {
                     this._oUserModel = new JSONModel({
-                        enableSave: false,
+                        enableSave         : false,
                         materialInfoVisible: false,
                         quantityInfoVisible: false,
-                        inputPopulated: false,
-                        woOrderFound: true,
-                        userInfoVisible: false
+                        inputPopulated     : false,
+                        woOrderFound       : true,
+                        userInfoVisible    : false
                     });
                     this.getView().setModel(this._oUserModel , "userModel");
 
-                    let sCurrentUser = sap.ushell.Container.getService("UserInfo");
-                    let sSapUsername = sap.ushell.Container.getService("UserInfo").getEmail() ? 
+                    let sCurrentUser = sap.ushell.Container.getService("UserInfo"),
+                        sSapUsername = sap.ushell.Container.getService("UserInfo").getEmail() ? 
                                         sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
-                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    // this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
+                    // let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
-                    // this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('JBULDA')`;
+                    //use for testing locally. DEFAULT_USER does not exist in the backend
+                    this._oUserModel.setProperty("/user", "JBULDA");
+                    let sPath = `/User('JBULDA')`;
+
                     this._oDataModel.read(sPath, {
                         success: oResult => {
-                            this._oUserModel.setProperty("/userInfoVisible", true);
-                            this._oUserModel.setProperty("/userPlant", oResult.Plant);
+                            this._oUserModel.setProperty("/userInfoVisible"  , true);
+                            this._oUserModel.setProperty("/userPlant"        , oResult.Plant);
                             this._oUserModel.setProperty("/userStoreLocation", oResult.StorageLocation);
                         },
                         error: function(oError) {
