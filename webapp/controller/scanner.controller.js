@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/base/Log",
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], function (Controller, JSONModel, Log, MessageBox, Filter, FilterOperator) {
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageToast",
+], function (Controller, JSONModel, Log, MessageBox, Filter, FilterOperator, MessageToast) {
         "use strict";
 
         return Controller.extend("rfscanner.pharmascience.controller.scanner", {
@@ -43,7 +44,8 @@ sap.ui.define([
             onMaterialChange: function(oEvent){
                 let oParams   = oEvent.getParameters(),
                     sMaterial = oParams.value;
-                
+
+                this._oWorkOrderModel.setProperty("/materialWarningVisible", false);
                 if (sMaterial !== "") 
                     this._getMaterial(sMaterial);
             },
@@ -99,7 +101,7 @@ sap.ui.define([
                         method       : "POST",
                         urlParameters: oParams,
                         success      : (oData, response) => {
-                            MessageBox.success(this._i18n.getText("MaterialAddded"));
+                            MessageToast.show(this._i18n.getText("MaterialAddded"));
                             this._setInitialData();
                         },
                         error        : oError => {
@@ -155,7 +157,7 @@ sap.ui.define([
                             let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
 
                             //set error message to the IllustratedMessage description field
-                            this._oWorkOrderModel.setProperty("/OrderNotFoundDescription", sErrorMsg);
+                            this._oWorkOrderModel.setProperty("/OrderNotFoundDescription", this._i18n.getText("NotFound", [sWoNumber]));
                             this._oWorkOrderModel.setProperty("/woOrderFound"            , false);
                         }.bind(this)
                     });
@@ -218,12 +220,12 @@ sap.ui.define([
                                         sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
-                    // this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    // let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
+                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    this._oUserModel.setProperty("/user", "JBULDA");
-                    let sPath = `/User('JBULDA')`;
+                    // this._oUserModel.setProperty("/user", "JBULDA");
+                    // let sPath = `/User('JBULDA')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
