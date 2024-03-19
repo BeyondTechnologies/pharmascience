@@ -140,7 +140,7 @@
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
                         </Label>
-                        <Input value="{workOrderModel>/material}" change="onMaterialChange">
+                        <Input id="materialNumber" value="{workOrderModel>/material}" change="onMaterialChange">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
@@ -201,7 +201,7 @@
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
                         </Label>
-                        <Input value="{workOrderModel>/Quantity}" liveChange="onQuantityChanged" valueState="{workOrderModel>/quantityValueState}">
+                        <Input id="materialQuantity" value="{workOrderModel>/Quantity}" liveChange="onQuantityChanged" valueState="{workOrderModel>/quantityValueState}">
                         <layoutData>
                             <l:GridData span="XL4 L4 M4 S4" />
                         </layoutData>            

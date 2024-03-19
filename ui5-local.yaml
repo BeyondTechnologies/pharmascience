@@ -33,11 +33,11 @@ server:
           - path: /sap
             url: http://devpms:443/
             client: '300'
-            destination: dev_pp
+            destination: system_pp
           - path: /sap
             url: http://devpms:443/
             client: '300'
-            destination: dev_pp
+            destination: system_pp
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:

@@ -27,7 +27,7 @@ sap.ui.define([
 
             onWorkOrderScanSuccess: function(oEvent) {
                 let oParams   = oEvent.getParameters(),
-                    sWoNumber = oParams.text;
+                    sWoNumber = oParams ? oParams.text : oEvent;
 
                 sWoNumber !== "" ? this._getWorkOrder(sWoNumber) : this._setInitialData();
                 
@@ -46,15 +46,14 @@ sap.ui.define([
                     sMaterial = oParams.value;
 
                 this._oWorkOrderModel.setProperty("/materialWarningVisible", false);
-                if (sMaterial !== "") 
+                if (sMaterial !== "")
                     this._getMaterial(sMaterial);
             },
 
             onMaterialScanSuccess: function(oEvent) {
                 let oParams   = oEvent.getParameters(),
-                    sMaterial = oParams.text;
+                    sMaterial = oParams ? oParams.text : oEvent;
 
-               
                 if (sMaterial !== "") 
                     this._getMaterial(sMaterial);
 
@@ -150,6 +149,15 @@ sap.ui.define([
                             //reset material fields in case of material re-scan
                             this._oWorkOrderModel.setProperty("/material", "");
                             this._oWorkOrderModel.setProperty("/materialDescription", "");
+
+                            var oMaterialInput =  this.byId("materialNumber");
+                            oMaterialInput.addEventDelegate({
+                                onAfterRendering: function(){
+                                    oMaterialInput.focus();
+                                    oMaterialInput.onfocusin();
+                                }
+                            });
+
                             resolve();
                         },
                         error: function(oError) {
@@ -183,6 +191,14 @@ sap.ui.define([
                         this._oWorkOrderModel.setProperty("/Quantity"           , "");
                         this._oWorkOrderModel.setProperty("/quantityValueState" , "None");
                         this._oWorkOrderModel.setProperty("/quantityInfoVisible", true);
+
+                        var oQuantityInput =  this.byId("materialQuantity");
+                            oQuantityInput.addEventDelegate({
+                                onAfterRendering: function(){
+                                    oQuantityInput.focus();
+                                    oQuantityInput.onfocusin(); 
+                                }
+                            });
 
                         //if remaining quantity is 0
                         if (parseFloat(oResult.results[0].QuantityInStock) < 1){
@@ -220,12 +236,12 @@ sap.ui.define([
                                         sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
-                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    // this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
+                    // let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    // this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('JBULDA')`;
+                    this._oUserModel.setProperty("/user", "JBULDA");
+                    let sPath = `/User('JBULDA')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {

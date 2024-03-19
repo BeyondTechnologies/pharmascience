@@ -5,7 +5,7 @@
     {
       "source": "^/sap/(.*)$",
       "target": "/sap/$1",
-      "destination": "dev_pp",
+      "destination": "system_pp",
       "authenticationType": "xsuaa",
       "csrfProtection": false
     },
