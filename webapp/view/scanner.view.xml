@@ -83,7 +83,7 @@
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
                         </Label>
-                        <Input value="{workOrderModel>/workOrder}" change="onWorkOrderChange">
+                        <Input id="orderNumber" value="{workOrderModel>/workOrder}" change="onWorkOrderChange">
                             <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
                             </layoutData>
