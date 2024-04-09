@@ -56,6 +56,13 @@
                     </Text>
                 </f:content>
             </f:SimpleForm>
+            <MessageStrip
+                id="successMessage"
+				type="Success"
+				enableFormattedText="true"
+                visible="false"
+                >
+			</MessageStrip>
             <IllustratedMessage
                 illustrationType="sapIllus-NoEntries"
                 description="{userModel>/UserNotFoundDescription}"
@@ -213,13 +220,39 @@
                         </Input>
                     </f:content>
                 </f:SimpleForm>
+                <f:SimpleForm
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="10"
+                    labelSpanL="10"
+                    labelSpanM="10"
+                    labelSpanS="10"
+                    adjustLabelSpan="false"
+                    emptySpanXL="4"
+                    emptySpanL="4"
+                    emptySpanM="4"
+                    emptySpanS="4"
+                    columnsXL="1"
+                    columnsL="1"
+                    columnsM="1"
+                    singleContainerFullSize="false" 
+                    visible="{workOrderModel>/quantityInfoVisible}">
+                    <f:content>
+                        <Label text="">
+                         <layoutData>
+                                <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Label>
+                       <Button type="Emphasized" text="{i18n>Save}" press="onSaveMaterial" enabled="{workOrderModel>/enableSave}">
+                       </Button>
+                    </f:content>
+                </f:SimpleForm>
         </VBox>
         
         </content>
         <footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button type="Emphasized" text="{i18n>Save}" press="onSaveMaterial" enabled="{workOrderModel>/enableSave}"/>
+				<!-- <Button type="Emphasized" text="{i18n>Save}" press="onSaveMaterial" enabled="{workOrderModel>/enableSave}"/> -->
 			</Toolbar>
 		</footer>
     </Page>

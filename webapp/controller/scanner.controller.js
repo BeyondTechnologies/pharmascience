@@ -72,8 +72,7 @@ sap.ui.define([
                     sQty   = oParam.value,
                     dQuantityInStock = this._oWorkOrderModel.getProperty("/quantityInStock");
 
-                if (sQty !== "")
-                    this._oWorkOrderModel.setProperty("/enableSave", true);
+                sQty == "" ? this._oWorkOrderModel.setProperty("/enableSave", false): this._oWorkOrderModel.setProperty("/enableSave", true);
                 if (parseFloat(sQty) > dQuantityInStock){
                     oEvent.getSource().setValueState("Error");
                     oEvent.getSource().setValueStateText(this._i18n.getText("CannotBeHigherThanStockQuantity", [dQuantityInStock]));
@@ -100,8 +99,18 @@ sap.ui.define([
                         method       : "POST",
                         urlParameters: oParams,
                         success      : (oData, response) => {
-                            MessageToast.show(this._i18n.getText("MaterialAddded"));
-                            this._setInitialData();
+                            let sOrderId        = this._oWorkOrderModel.getData().workOrder,
+                                sMaterialnumber = this._oWorkOrderModel.getData().material,
+                                sQuantity       = this._oWorkOrderModel.getData().Quantity;
+                            
+                            MessageBox.success(this._i18n.getText("MaterialAddded", [sOrderId, sMaterialnumber, sQuantity]), {
+                                onClose: async () => {
+                                    await this._setInitialData();
+
+                                    this._setFocus("orderNumber");
+                                    
+                                },
+                            });
                         },
                         error        : oError => {
                             let sErrorMsg = JSON.parse(oError.responseText).error.message.value;
@@ -125,14 +134,7 @@ sap.ui.define([
                     materialWarningVisible: false
                 });
                 this.getView().setModel(this._oWorkOrderModel , "workOrderModel");
-
-                var oOrdernumber =  this.byId("orderNumber");
-                    oOrdernumber.addEventDelegate({
-                        onAfterRendering: function(){
-                            oOrdernumber.focus();
-                            oOrdernumber.onfocusin();
-                        }
-                    });
+                this._setFocus("orderNumber");
             },
 
             _getWorkOrder: function(sWoNumber){
@@ -158,13 +160,7 @@ sap.ui.define([
                             this._oWorkOrderModel.setProperty("/material", "");
                             this._oWorkOrderModel.setProperty("/materialDescription", "");
 
-                            var oMaterialInput =  this.byId("materialNumber");
-                            oMaterialInput.addEventDelegate({
-                                onAfterRendering: function(){
-                                    oMaterialInput.focus();
-                                    oMaterialInput.onfocusin();
-                                }
-                            });
+                            this._setFocus("materialNumber");
 
                             resolve();
                         },
@@ -200,13 +196,7 @@ sap.ui.define([
                         this._oWorkOrderModel.setProperty("/quantityValueState" , "None");
                         this._oWorkOrderModel.setProperty("/quantityInfoVisible", true);
 
-                        var oQuantityInput =  this.byId("materialQuantity");
-                            oQuantityInput.addEventDelegate({
-                                onAfterRendering: function(){
-                                    oQuantityInput.focus();
-                                    oQuantityInput.onfocusin(); 
-                                }
-                            });
+                        this._setFocus("materialQuantity");
 
                         //if remaining quantity is 0
                         if (parseFloat(oResult.results[0].QuantityInStock) < 1){
@@ -263,6 +253,16 @@ sap.ui.define([
                         }.bind(this)
                     });
                 });
+            },
+
+            _setFocus: function(sControlId){
+                var oControl =  this.byId(sControlId);
+                    oControl.addEventDelegate({
+                        onAfterRendering: function(){
+                            oControl.focus();
+                            oControl.onfocusin();
+                        }
+                    });
             }
         });
     });
