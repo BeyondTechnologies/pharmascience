@@ -120,7 +120,7 @@
                                 <l:GridData span="XL1 L1 M1 S1" />
                             </layoutData>
                         </Label>
-                        <Text text="{workOrderModel>/OperationNo}" visible="{= ${workOrderModel>/OperationNo}}">
+                        <Text text="{workOrderModel>/OperationNo}" visible="{= ${workOrderModel>/OperationVisible}}">
                              <layoutData>
                                 <l:GridData span="XL1 L1 M1 S1"/>
                             </layoutData>

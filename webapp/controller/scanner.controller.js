@@ -132,7 +132,7 @@ sap.ui.define([
                     materialInfoVisible   : false,
                     quantityInfoVisible   : false,
                     OperationVisible      : false,
-                    //OperationNo           : "",
+                    OperationNo           : "",
                     MultipleOperations    : "",
                     inputPopulated        : false,
                     woOrderFound          : true,
@@ -149,6 +149,7 @@ sap.ui.define([
                     this._oDataModel.read(sPath, {
                         success: oResult => {
                             this._oWorkOrderModel.setProperty("/OperationVisible"        , false); 
+                            this._oWorkOrderModel.setProperty("/OperationNo"        , ""); 
                             //Call Fragment if the Multiple Operatios is True
                             if (oResult.MultipleOperations == "X") {
                                 let sPathOper = `/WorkOrder('${sWoNumber}')/toOperation`;
@@ -270,11 +271,11 @@ sap.ui.define([
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
                     this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    //let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                     this._oUserModel.setProperty("/user", "JBULDA");
-                     let sPath = `/User('JBULDA')`;
+                    // this._oUserModel.setProperty("/user", "JBULDA");
+                    // let sPath = `/User('JBULDA')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
@@ -304,7 +305,8 @@ sap.ui.define([
                 oBinding.filter([]);
                 var aContexts = oEvent.getParameter("selectedContexts");
                 var Oper = oEvent.getParameter("selectedContexts").map(function (oContext) { return oContext.getObject().OperationNo; })[0]
-                this._oWorkOrderModel.setProperty("/OperationNo"           ,Oper);    
+                this._oWorkOrderModel.setProperty("/OperationNo"           ,Oper); 
+                oEvent.getSource().destroy();   
         }  
             //sWoNumber !== "" ? this._getWorkOrder(sWoNumber) : this._setInitialData();
             
