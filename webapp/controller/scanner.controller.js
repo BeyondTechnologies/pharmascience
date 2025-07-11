@@ -132,6 +132,8 @@ sap.ui.define([
                     materialInfoVisible   : false,
                     quantityInfoVisible   : false,
                     OperationVisible      : false,
+                    //OperationNo           : "",
+                    MultipleOperations    : "",
                     inputPopulated        : false,
                     woOrderFound          : true,
                     quantityValueState    : "None",
@@ -146,6 +148,7 @@ sap.ui.define([
                     let sPath = `/WorkOrder('${sWoNumber}')`;
                     this._oDataModel.read(sPath, {
                         success: oResult => {
+                            this._oWorkOrderModel.setProperty("/OperationVisible"        , false); 
                             //Call Fragment if the Multiple Operatios is True
                             if (oResult.MultipleOperations == "X") {
                                 let sPathOper = `/WorkOrder('${sWoNumber}')/toOperation`;
@@ -165,7 +168,12 @@ sap.ui.define([
                                       
                                 }   
                                 });
-                            }  
+
+                            } 
+                           else
+                           {
+                            this._oWorkOrderModel.setProperty("/OperationNo"        , ""); 
+                           }
                             //set Order info
                             this._oWorkOrderModel.setProperty("/workOrder"           , oResult.OrderID);
                             this._oWorkOrderModel.setProperty("/workOrderDescription", oResult.Text);
@@ -262,11 +270,11 @@ sap.ui.define([
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
                     this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    //let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    // this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('JBULDA')`;
+                     this._oUserModel.setProperty("/user", "JBULDA");
+                     let sPath = `/User('JBULDA')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
