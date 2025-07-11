@@ -1,0 +1,39 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<TableSelectDialog
+		id="selectOperation"
+		noDataText="No Operations Found"
+		title="Select Operation"
+		search=".handleSearch"
+		confirm=".handleClose"
+		cancel=".handleClose"
+		items="{
+			path : 'workOrderModel>/Operations'
+		}">
+		<ColumnListItem vAlign="Middle">
+			<cells>
+				<Text text="{workOrderModel>OrderID}" />
+                <Text text="{workOrderModel>OperationNo}" />
+                <Text text="{workOrderModel>OperationText}" />
+			</cells>
+		</ColumnListItem>
+		<columns>
+			<Column width="12em">
+				<header>
+					<Text text="OrderID" />
+				</header>
+			</Column>
+            			<Column width="12em">
+				<header>
+					<Text text="OperationNo" />
+				</header>
+			</Column>
+            			<Column width="12em">
+				<header>
+					<Text text="OperationText" />
+				</header>
+			</Column>
+		</columns>
+	</TableSelectDialog>
+</core:FragmentDefinition>

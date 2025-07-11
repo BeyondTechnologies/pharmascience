@@ -6,7 +6,8 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageToast",
-], function (Controller, JSONModel, Log, MessageBox, Filter, FilterOperator, MessageToast) {
+    "sap/ui/core/Fragment",
+], function (Controller, JSONModel, Log, MessageBox, Filter, FilterOperator, MessageToast, Fragment) {
         "use strict";
 
         return Controller.extend("rfscanner.pharmascience.controller.scanner", {
@@ -89,6 +90,7 @@ sap.ui.define([
                 
                 let oParams = {
                     OrderID      : oModelData.workOrder,
+                    OperationNo  : oModelData.OperationNo,
                     Material     : oModelData.material,
                     Quantity     : oModelData.Quantity,
                     Plant        : oUserData.userPlant,
@@ -102,8 +104,9 @@ sap.ui.define([
                             let sOrderId        = this._oWorkOrderModel.getData().workOrder,
                                 sMaterialnumber = this._oWorkOrderModel.getData().material,
                                 sQuantity       = this._oWorkOrderModel.getData().Quantity;
+                                sOperationNo    = this._oWorkOrderModel.getData().OperationNo;
                             
-                            MessageBox.success(this._i18n.getText("MaterialAddded", [sOrderId, sMaterialnumber, sQuantity]), {
+                            MessageBox.success(this._i18n.getText("MaterialAddded", [sOrderId, sMaterialnumber, sQuantity,sOperationNo]), {
                                 onClose: async () => {
                                     await this._setInitialData();
 
@@ -128,6 +131,7 @@ sap.ui.define([
                     enableSave            : false,
                     materialInfoVisible   : false,
                     quantityInfoVisible   : false,
+                    OperationVisible      : false,
                     inputPopulated        : false,
                     woOrderFound          : true,
                     quantityValueState    : "None",
@@ -142,6 +146,26 @@ sap.ui.define([
                     let sPath = `/WorkOrder('${sWoNumber}')`;
                     this._oDataModel.read(sPath, {
                         success: oResult => {
+                            //Call Fragment if the Multiple Operatios is True
+                            if (oResult.MultipleOperations == "X") {
+                                let sPathOper = `/WorkOrder('${sWoNumber}')/toOperation`;
+                                this._oDataModel.read(sPathOper, {
+                                success: oResult => {
+                                    Fragment.load({
+                                        name: "rfscanner.pharmascience.view.Operations",
+                                        controller: this
+                                      }).then((fragment) => {
+                                        this.getView().addDependent(fragment);
+                                      //  fragment.setModel(this.getModel(""));
+                                        this._oWorkOrderModel.setProperty("/Operations"           , oResult.results);
+                                        fragment.open();
+                                        this._oWorkOrderModel.setProperty("/OperationNo"           , oResult.OperationNo);
+                                        this._oWorkOrderModel.setProperty("/OperationVisible"        , true);
+                                      });
+                                      
+                                }   
+                                });
+                            }  
                             //set Order info
                             this._oWorkOrderModel.setProperty("/workOrder"           , oResult.OrderID);
                             this._oWorkOrderModel.setProperty("/workOrderDescription", oResult.Text);
@@ -163,6 +187,8 @@ sap.ui.define([
                             this._setFocus("materialNumber");
 
                             resolve();
+                                
+                            
                         },
                         error: function(oError) {
                             this._setInitialData();
@@ -222,6 +248,7 @@ sap.ui.define([
                     this._oUserModel = new JSONModel({
                         enableSave         : false,
                         materialInfoVisible: false,
+                        OperationVisible   : false,
                         quantityInfoVisible: false,
                         inputPopulated     : false,
                         woOrderFound       : true,
@@ -263,6 +290,15 @@ sap.ui.define([
                             oControl.onfocusin();
                         }
                     });
-            }
+            },
+            handleClose: function(oEvent){
+                var oBinding = oEvent.getSource().getBinding("items");
+                oBinding.filter([]);
+                var aContexts = oEvent.getParameter("selectedContexts");
+                var Oper = oEvent.getParameter("selectedContexts").map(function (oContext) { return oContext.getObject().OperationNo; })[0]
+                this._oWorkOrderModel.setProperty("/OperationNo"           ,Oper);    
+        }  
+            //sWoNumber !== "" ? this._getWorkOrder(sWoNumber) : this._setInitialData();
+            
         });
     });

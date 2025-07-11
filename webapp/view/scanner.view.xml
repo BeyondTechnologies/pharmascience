@@ -73,7 +73,7 @@
                     layout="ResponsiveGridLayout"
                     labelSpanXL="16"
                     labelSpanL="4"
-                    labelSpanM="3"
+                    labelSpanM="4"
                     labelSpanS="12"
                     adjustLabelSpan="false"
                     emptySpanXL="4"
@@ -113,6 +113,16 @@
                         <Text text="{workOrderModel>/workOrderDescription}" visible="{= ${workOrderModel>/materialInfoVisible}}">
                              <layoutData>
                                 <l:GridData span="XL4 L4 M4 S4" />
+                            </layoutData>
+                        </Text>
+                        <Label text="{i18n>Operation}" visible="{= ${workOrderModel>/OperationVisible}}">
+                            <layoutData>
+                                <l:GridData span="XL1 L1 M1 S1" />
+                            </layoutData>
+                        </Label>
+                        <Text text="{workOrderModel>/OperationNo}" visible="{= ${workOrderModel>/OperationNo}}">
+                             <layoutData>
+                                <l:GridData span="XL1 L1 M1 S1"/>
                             </layoutData>
                         </Text>
                     </f:content>
