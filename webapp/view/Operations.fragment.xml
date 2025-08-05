@@ -6,7 +6,7 @@
 		noDataText="No Operations Found"
 		title="Select Operation"
 		search=".handleSearch"
-		confirm=".handleClose"
+		confirm=".handleConfirm"
 		cancel=".handleClose"
 		items="{
 			path : 'workOrderModel>/Operations'
@@ -21,17 +21,17 @@
 		<columns>
 			<Column width="12em">
 				<header>
-					<Text text="OrderID" />
+					<Text text="{i18n>OrderID}" />
 				</header>
 			</Column>
             			<Column width="12em">
 				<header>
-					<Text text="OperationNo" />
+					<Text text="{i18n>OperationNo}" />
 				</header>
 			</Column>
             			<Column width="12em">
 				<header>
-					<Text text="OperationText" />
+					<Text text="{i18n>OperationText}" />
 				</header>
 			</Column>
 		</columns>

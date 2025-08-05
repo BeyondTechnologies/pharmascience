@@ -134,6 +134,8 @@ sap.ui.define([
                     OperationVisible      : false,
                     OperationNo           : "",
                     MultipleOperations    : "",
+                    workOrder             : "",
+                    workOrderDescription  : "",
                     inputPopulated        : false,
                     woOrderFound          : true,
                     quantityValueState    : "None",
@@ -148,26 +150,51 @@ sap.ui.define([
                     let sPath = `/WorkOrder('${sWoNumber}')`;
                     this._oDataModel.read(sPath, {
                         success: oResult => {
-                            this._oWorkOrderModel.setProperty("/OperationVisible"        , false); 
-                            this._oWorkOrderModel.setProperty("/OperationNo"        , ""); 
+                            //this._oWorkOrderModel.setProperty("/OperationVisible"        , false); 
+                            //this._oWorkOrderModel.setProperty("/OperationNo"        , ""); 
                             //Call Fragment if the Multiple Operatios is True
                             if (oResult.MultipleOperations == "X") {
                                 let sPathOper = `/WorkOrder('${sWoNumber}')/toOperation`;
                                 this._oDataModel.read(sPathOper, {
-                                success: oResult => {
+                                    success: oResult => {
+                                        if (!this._oOperationsFragment) {
+                                            Fragment.load({
+                                                name: "rfscanner.pharmascience.view.Operations",
+                                                id: this.getView().getId(), // Ensures unique IDs per view
+                                                controller: this
+                                            }).then((fragment) => {
+                                                this._oOperationsFragment = fragment; // Cache the fragment
+                                                this.getView().addDependent(fragment);
+                                    
+                                                // Update model properties
+                                                this._oWorkOrderModel.setProperty("/Operations", oResult.results);
+                                                this._oWorkOrderModel.setProperty("/OperationNo", oResult.OperationNo);
+                                                this._oWorkOrderModel.setProperty("/OperationVisible", true);
+                                    
+                                                fragment.open();
+                                            });
+                                        } else {
+                                            // Just update model and reopen the existing fragment
+                                            this._oWorkOrderModel.setProperty("/Operations", oResult.results);
+                                            this._oWorkOrderModel.setProperty("/OperationNo", oResult.OperationNo);
+                                            this._oWorkOrderModel.setProperty("/OperationVisible", true);
+                                    
+                                            this._oOperationsFragment.open();
+                                        }
+                                    }
+                               /* success: oResult => {
                                     Fragment.load({
                                         name: "rfscanner.pharmascience.view.Operations",
                                         controller: this
                                       }).then((fragment) => {
                                         this.getView().addDependent(fragment);
-                                      //  fragment.setModel(this.getModel(""));
                                         this._oWorkOrderModel.setProperty("/Operations"           , oResult.results);
                                         fragment.open();
                                         this._oWorkOrderModel.setProperty("/OperationNo"           , oResult.OperationNo);
                                         this._oWorkOrderModel.setProperty("/OperationVisible"        , true);
                                       });
                                       
-                                }   
+                                }   */
                                 });
 
                             } 
@@ -274,8 +301,8 @@ sap.ui.define([
                     let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    // this._oUserModel.setProperty("/user", "JBULDA");
-                    // let sPath = `/User('JBULDA')`;
+                    //this._oUserModel.setProperty("/user", "JBULDA");
+                    //let sPath = `/User('JBULDA')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
@@ -300,15 +327,43 @@ sap.ui.define([
                         }
                     });
             },
-            handleClose: function(oEvent){
+            /*handleConfirm: function(oEvent){
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([]);
                 var aContexts = oEvent.getParameter("selectedContexts");
                 var Oper = oEvent.getParameter("selectedContexts").map(function (oContext) { return oContext.getObject().OperationNo; })[0]
                 this._oWorkOrderModel.setProperty("/OperationNo"           ,Oper); 
                 oEvent.getSource().destroy();   
-        }  
+        }, */
+        handleConfirm: function (oEvent) {
+            var oBinding = oEvent.getSource().getBinding("items");
+            if (oBinding) {
+                oBinding.filter([]);
+            }
+        
+            var aContexts = oEvent.getParameter("selectedContexts");
+            if (aContexts && aContexts.length) {
+                var Oper = aContexts[0].getObject().OperationNo;
+                this._oWorkOrderModel.setProperty("/OperationNo", Oper);
+            }
+        
+            oEvent.getSource().close(); // ✅ safer than destroy
+        }, 
             //sWoNumber !== "" ? this._getWorkOrder(sWoNumber) : this._setInitialData();
-            
+            handleClose: function(oEvent){
+                this._setInitialData();
+
+                this._setFocus("orderNumber");
+
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("Routescanner");
+                
+                //var oBinding = oEvent.getSource().getBinding("items");
+                //oBinding.filter([]);
+                //var aContexts = oEvent.getParameter("selectedContexts");
+                //var Oper = oEvent.getParameter("selectedContexts").map(function (oContext) { return oContext.getObject().OperationNo; })[0]
+                //  this._oWorkOrderModel.setProperty("/OperationNo"           ,Oper); 
+                //oEvent.getSource().destroy();   
+        } 
         });
     });
