@@ -103,7 +103,7 @@ sap.ui.define([
                         success      : (oData, response) => {
                             let sOrderId        = this._oWorkOrderModel.getData().workOrder,
                                 sMaterialnumber = this._oWorkOrderModel.getData().material,
-                                sQuantity       = this._oWorkOrderModel.getData().Quantity;
+                                sQuantity       = this._oWorkOrderModel.getData().Quantity,
                                 sOperationNo    = this._oWorkOrderModel.getData().OperationNo;
                             
                             MessageBox.success(this._i18n.getText("MaterialAddded", [sOrderId, sMaterialnumber, sQuantity,sOperationNo]), {
@@ -357,13 +357,7 @@ sap.ui.define([
 
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("Routescanner");
-                
-                //var oBinding = oEvent.getSource().getBinding("items");
-                //oBinding.filter([]);
-                //var aContexts = oEvent.getParameter("selectedContexts");
-                //var Oper = oEvent.getParameter("selectedContexts").map(function (oContext) { return oContext.getObject().OperationNo; })[0]
-                //  this._oWorkOrderModel.setProperty("/OperationNo"           ,Oper); 
-                //oEvent.getSource().destroy();   
+                 
         } 
         });
     });
