@@ -301,8 +301,8 @@ sap.ui.define([
                     let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    //this._oUserModel.setProperty("/user", "JBULDA");
-                    //let sPath = `/User('JBULDA')`;
+                    //this._oUserModel.setProperty("/user", "VBRUNET");
+                    //let sPath = `/User('VBRUNET')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
