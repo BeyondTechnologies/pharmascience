@@ -297,12 +297,12 @@ sap.ui.define([
                                         sap.ushell.Container.getService("UserInfo").getEmail().split("@")[0] :
                                         sap.ushell.Container.getService("UserInfo").getId();
                                       
-                    //this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
-                    //let sPath = `/User('${sSapUsername.toUpperCase()}')`;
+                    this._oUserModel.setProperty("/user", `${sCurrentUser.getFullName()} (${sSapUsername.toUpperCase()})`);
+                    let sPath = `/User('${sSapUsername.toUpperCase()}')`;
 
                     //use for testing locally. DEFAULT_USER does not exist in the backend
-                    this._oUserModel.setProperty("/user", "VBRUNET");
-                    let sPath = `/User('VBRUNET')`;
+                    // this._oUserModel.setProperty("/user", "VBRUNET");
+                    // let sPath = `/User('VBRUNET')`;
 
                     this._oDataModel.read(sPath, {
                         success: oResult => {
